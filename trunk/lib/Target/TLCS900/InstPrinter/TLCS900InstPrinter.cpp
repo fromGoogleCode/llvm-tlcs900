@@ -92,23 +92,23 @@ void TLCS900InstPrinter::printCCOperand(const MCInst *MI, unsigned OpNo,
   switch (CC) {
   default:
    llvm_unreachable("Unsupported CC code");
-  case TLCS900CC::COND_E:
+  case TLCS900CC::COND_EQ:
    O << "eq";
    break;
   case TLCS900CC::COND_NE:
    O << "ne";
    break;
-  case TLCS900CC::COND_HS:
-   O << "hs";
+  case TLCS900CC::COND_UGE:
+   O << "uge";
    break;
-  case TLCS900CC::COND_LO:
-   O << "lo";
+  case TLCS900CC::COND_ULT:
+   O << "ult";
    break;
   case TLCS900CC::COND_GE:
    O << "ge";
    break;
-  case TLCS900CC::COND_L:
-   O << 'l';
+  case TLCS900CC::COND_LT:
+   O << "lt";
    break;
   }
 }

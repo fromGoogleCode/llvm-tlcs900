@@ -667,7 +667,7 @@ static SDValue EmitCMP(SDValue &LHS, SDValue &RHS, SDValue &TargetCC,
   switch (CC) {
   default: llvm_unreachable("Invalid integer condition!");
   case ISD::SETEQ:
-    TCC = TLCS900CC::COND_E;     // aka COND_Z
+    TCC = TLCS900CC::COND_EQ;     // aka COND_Z
     // Minor optimization: if LHS is a constant, swap operands, then the
     // constant can be folded into comparison.
     if (LHS.getOpcode() == ISD::Constant)
@@ -688,10 +688,10 @@ static SDValue EmitCMP(SDValue &LHS, SDValue &RHS, SDValue &TargetCC,
     if (const ConstantSDNode * C = dyn_cast<ConstantSDNode>(LHS)) {
       LHS = RHS;
       RHS = DAG.getConstant(C->getSExtValue() + 1, C->getValueType(0));
-      TCC = TLCS900CC::COND_LO;
+      TCC = TLCS900CC::COND_ULT;
       break;
     }
-    TCC = TLCS900CC::COND_HS;    // aka COND_C
+    TCC = TLCS900CC::COND_UGE;    // aka COND_C
     break;
   case ISD::SETUGT:
     std::swap(LHS, RHS);        // FALLTHROUGH
@@ -701,10 +701,10 @@ static SDValue EmitCMP(SDValue &LHS, SDValue &RHS, SDValue &TargetCC,
     if (const ConstantSDNode * C = dyn_cast<ConstantSDNode>(LHS)) {
       LHS = RHS;
       RHS = DAG.getConstant(C->getSExtValue() + 1, C->getValueType(0));
-      TCC = TLCS900CC::COND_HS;
+      TCC = TLCS900CC::COND_UGE;
       break;
     }
-    TCC = TLCS900CC::COND_LO;    // aka COND_NC
+    TCC = TLCS900CC::COND_ULT;    // aka COND_NC
     break;
   case ISD::SETLE:
     std::swap(LHS, RHS);        // FALLTHROUGH
@@ -714,7 +714,7 @@ static SDValue EmitCMP(SDValue &LHS, SDValue &RHS, SDValue &TargetCC,
     if (const ConstantSDNode * C = dyn_cast<ConstantSDNode>(LHS)) {
       LHS = RHS;
       RHS = DAG.getConstant(C->getSExtValue() + 1, C->getValueType(0));
-      TCC = TLCS900CC::COND_L;
+      TCC = TLCS900CC::COND_LT;
       break;
     }
     TCC = TLCS900CC::COND_GE;
@@ -730,7 +730,7 @@ static SDValue EmitCMP(SDValue &LHS, SDValue &RHS, SDValue &TargetCC,
       TCC = TLCS900CC::COND_GE;
       break;
     }
-    TCC = TLCS900CC::COND_L;
+    TCC = TLCS900CC::COND_LT;
     break;
   }
 
@@ -788,10 +788,10 @@ SDValue TLCS900TargetLowering::LowerSETCC(SDValue Op, SelectionDAG &DAG) const {
    default:
     Convert = false;
     break;
-   case TLCS900CC::COND_HS:
+   case TLCS900CC::COND_UGE:
      // Res = SRW & 1, no processing is required
      break;
-   case TLCS900CC::COND_LO:
+   case TLCS900CC::COND_ULT:
      // Res = ~(SRW & 1)
      Invert = true;
      break;
@@ -804,7 +804,7 @@ SDValue TLCS900TargetLowering::LowerSETCC(SDValue Op, SelectionDAG &DAG) const {
        Invert = true;
      }
      break;
-   case TLCS900CC::COND_E:
+   case TLCS900CC::COND_EQ:
      Shift = true;
      // C = ~Z for AND instruction, thus we can put Res = ~(SRW & 1), however,
      // Res = (SRW >> 1) & 1 is 1 word shorter.
@@ -996,7 +996,7 @@ bool TLCS900TargetLowering::isTruncateFree(EVT VT1, EVT VT2) const {
   return (VT1.getSizeInBits() > VT2.getSizeInBits());
 }
 
-bool TLCS900TargetLowering::isZExtFree(Type *Ty1, Type *Ty2) const {
+/*bool TLCS900TargetLowering::isZExtFree(Type *Ty1, Type *Ty2) const {
   // TLCS900 implicitly zero-extends 8-bit results in 16-bit registers.
   return 0 && Ty1->isIntegerTy(8) && Ty2->isIntegerTy(16);
 }
@@ -1004,7 +1004,7 @@ bool TLCS900TargetLowering::isZExtFree(Type *Ty1, Type *Ty2) const {
 bool TLCS900TargetLowering::isZExtFree(EVT VT1, EVT VT2) const {
   // TLCS900 implicitly zero-extends 8-bit results in 16-bit registers.
   return 0 && VT1 == MVT::i8 && VT2 == MVT::i16;
-}
+}*/
 
 //===----------------------------------------------------------------------===//
 //  Other Lowering Code
@@ -1087,7 +1087,7 @@ TLCS900TargetLowering::EmitShiftInstr(MachineInstr *MI,
     .addReg(ShiftAmtSrcReg).addImm(0);
   BuildMI(BB, dl, TII.get(TLCS900::JCC))
     .addMBB(RemBB)
-    .addImm(TLCS900CC::COND_E);
+    .addImm(TLCS900CC::COND_EQ);
 
   // LoopBB:
   // ShiftReg = phi [%SrcReg, BB], [%ShiftReg2, LoopBB]

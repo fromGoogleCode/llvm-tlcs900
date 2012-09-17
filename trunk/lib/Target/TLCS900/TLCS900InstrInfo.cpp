@@ -131,23 +131,23 @@ ReverseBranchCondition(SmallVectorImpl<MachineOperand> &Cond) const {
 
   switch (CC) {
   default: llvm_unreachable("Invalid branch condition!");
-  case TLCS900CC::COND_E:
+  case TLCS900CC::COND_EQ:
     CC = TLCS900CC::COND_NE;
     break;
   case TLCS900CC::COND_NE:
-    CC = TLCS900CC::COND_E;
+    CC = TLCS900CC::COND_EQ;
     break;
-  case TLCS900CC::COND_L:
+  case TLCS900CC::COND_LT:
     CC = TLCS900CC::COND_GE;
     break;
   case TLCS900CC::COND_GE:
-    CC = TLCS900CC::COND_L;
+    CC = TLCS900CC::COND_LT;
     break;
-  case TLCS900CC::COND_HS:
-    CC = TLCS900CC::COND_LO;
+  case TLCS900CC::COND_UGE:
+    CC = TLCS900CC::COND_ULT;
     break;
-  case TLCS900CC::COND_LO:
-    CC = TLCS900CC::COND_HS;
+  case TLCS900CC::COND_ULT:
+    CC = TLCS900CC::COND_UGE;
     break;
   }
 
