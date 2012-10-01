@@ -11,7 +11,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#define DEBUG_TYPE "msp430-lower"
+#define DEBUG_TYPE "tlcs900-lower"
 
 #include "TLCS900ISelLowering.h"
 #include "TLCS900.h"
@@ -45,7 +45,7 @@ typedef enum {
 } HWMultUseMode;
 
 static cl::opt<HWMultUseMode>
-HWMultMode("msp430-hwmult-mode",
+HWMultMode("tlcs900-hwmult-mode",
            cl::desc("Hardware multiplier use mode"),
            cl::init(HWMultNoIntr),
            cl::values(
