@@ -98,6 +98,7 @@ let Namespace = "TLCS900" in {
 
   // Flags register
   def F : Register<"f">;
+  def F2 : Register<"f2">;	// Actually F'
   
   let SubRegIndices = [subreg_8bit] in {
   def SR : RegisterWithSubRegs<"sr", [F]>;
@@ -161,7 +162,7 @@ def GR32 : RegisterClass<"TLCS900", [i32], 32,
 
 
 def CCR8 : RegisterClass<"TLCS900", [i8], 8,
-  (add F)> {
+  (add F, F2)> {
     let CopyCost = -1;  // Don't allow copying of status registers.
     let isAllocatable = 0;
 }

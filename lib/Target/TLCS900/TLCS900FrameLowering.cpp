@@ -51,6 +51,8 @@ void TLCS900FrameLowering::emitPrologue(MachineFunction &MF) const {
   // Get the number of bytes to allocate from the FrameInfo.
   uint64_t StackSize = MFI->getStackSize();
 
+  // ToDo: The TLCS-900 has a LINK instruction. Use that instead.
+
   uint64_t NumBytes = 0;
   if (hasFP(MF)) {
     // Calculate required stack adjustment
